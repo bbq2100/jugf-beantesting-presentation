@@ -8,6 +8,8 @@ import info.novatec.beantest.demo.backend.BackEndOrderSystem;
 import info.novatec.beantest.demo.entities.Customer;
 import info.novatec.beantest.demo.entities.Order;
 import info.novatec.beantest.demo.entities.OrderStatus;
+import info.novatec.beantest.demo.entities.ShippingAddress;
+import info.novatec.beantest.demo.persistence.AddressPersistenceService;
 import info.novatec.beantest.demo.persistence.OrderPersistenceService;
 
 import javax.ejb.EJB;
@@ -32,6 +34,9 @@ public class OrderService {
     @EJB
     OrderPersistenceService orderPersistenceService;
 
+    @EJB
+    AddressPersistenceService addressPersistenceService;
+
     public double calculateOrderPrice(Order order) {
         double shippingCost = shippingService.calculateShipping(order);
         double orderPrice = order.getOrderitems().stream()
@@ -52,9 +57,11 @@ public class OrderService {
             throw new IllegalStateException("Invalid order");
         }
 
-
-
         order.setOrderStatus(OrderStatus.PLACED);
+
+        ShippingAddress shippingAddress = addressPersistenceService.save(order.getShippingAddress());
+        order.setShippingAddress(shippingAddress);
+
         orderPersistenceService.save(order);
 
         backEndOrderSystem.placeOrder(order);

@@ -16,6 +16,6 @@ import org.mockito.Mockito;
 public class MockProducer {
 
     @Produces
-    public static final BackEndOrderSystem backEndOrderSystemMock = Mockito
+    public static final BackEndOrderSystem backEndOrderSystem = Mockito
             .mock(BackEndOrderSystem.class);
 }

@@ -78,4 +78,22 @@ public class OrderServiceBeanTest extends BaseBeanTest {
         assertThat(orderCost, is(28.5));
     }
 
+    @Test
+    public void shouldPlaceOrder() {
+        OrderService orderService = getBean(OrderService.class);
+
+        Stream.of(Item.create("Item1", 10.0), Item.create("Item2", 5.0))
+                .map(i -> new OrderItem(i).withQuantity(2))
+                .forEach(orderWithShippingAddressInGermany::addOrderitem);
+
+        orderWithShippingAddressInGermany.setTotalPrice(123.45);
+
+        ArgumentCaptor<Order> orderArgumentCaptor = ArgumentCaptor.forClass(Order.class);
+
+        orderService.placeOrder(orderWithShippingAddressInGermany);
+
+        verify(MockProducer.backEndOrderSystem).placeOrder(orderArgumentCaptor.capture());
+        assertThat(orderWithShippingAddressInGermany.getCustomerId(), is(orderArgumentCaptor.getValue().getCustomerId()));
+    }
+
 }
